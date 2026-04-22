@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プログラミング言語タグ辞典</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <header class="hero">
+      <img class="hero-corner-icon" src="icon.png" alt="アプリアイコン">
+      <h1>プログラミング言語タグ辞典</h1>
+      <p>言語名を指定すると、代表的なタグ/キーワードに加えて、関数・変数の呼び方と使い方も表示します。</p>
+    </header>
+
+    <section class="panel">
+      <label for="languageInput" class="label">言語名</label>
+      <div class="input-row">
+        <input
+          id="languageInput"
+          list="languageCandidates"
+          type="text"
+          placeholder="例: python, js, java, csharp, html, sql"
+          autocomplete="off"
+        >
+        <button id="showButton" type="button">表示</button>
+      </div>
+      <datalist id="languageCandidates"></datalist>
+      <p class="hint">入力例: python / js / java / csharp / html / css / sql / go / rust</p>
+    </section>
+
+    <section id="result" class="panel result hidden" aria-live="polite">
+      <h2 id="languageTitle"></h2>
+      <p id="languageDescription" class="description"></p>
+      <div class="filter-row">
+        <label for="tagFilter">絞り込み</label>
+        <input id="tagFilter" type="text" placeholder="タグ・関数・変数名や意味で検索">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>分類</th>
+              <th>タグ/キーワード</th>
+              <th>呼び方</th>
+              <th>意味</th>
+              <th>使い方</th>
+              <th>例</th>
+            </tr>
+          </thead>
+          <tbody id="tagTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="message" class="message"></section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
