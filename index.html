@@ -14,6 +14,20 @@
       <p>言語名を指定すると、代表的なタグ/キーワードに加えて、関数・変数の呼び方と使い方も表示します。</p>
     </header>
 
+    <section class="panel timeline-panel">
+      <h2>会社の歴史タイムライン（サンプル）</h2>
+      <p class="timeline-intro">帯状に写真が流れます。年をクリックすると停止し、その年の出来事を表示します。</p>
+      <div class="timeline-controls">
+        <button id="timelinePlayButton" type="button">再生</button>
+        <button id="timelinePauseButton" type="button">停止</button>
+      </div>
+      <div id="timelineTrack" class="timeline-track" aria-label="歴史タイムライン"></div>
+      <article id="timelineDetail" class="timeline-detail">
+        <h3 id="timelineYear">1965年</h3>
+        <p id="timelineText">工場生産開始。ここから60年の歴史が始まりました。</p>
+      </article>
+    </section>
+
     <section class="panel">
       <label for="languageInput" class="label">言語名</label>
       <div class="input-row">
