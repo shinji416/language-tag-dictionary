@@ -1260,6 +1260,51 @@ function getCoverageStatus(key, items) {
 }
 
 
+const historyTimeline = [
+  {
+    year: 1965,
+    title: "工場生産開始",
+    description: "本社工場が稼働。量産体制を整備し、製品供給が本格化しました。",
+    photoLabel: "1965 Factory Start",
+    image: "linear-gradient(135deg, #6f8fff, #314a9f)"
+  },
+  {
+    year: 1972,
+    title: "第2ライン増設",
+    description: "需要拡大に対応するため、主要設備を増強して生産能力を拡大しました。",
+    photoLabel: "1972 Line Expansion",
+    image: "linear-gradient(135deg, #66d6ff, #2c718f)"
+  },
+  {
+    year: 1980,
+    title: "自動化設備導入",
+    description: "組立工程に自動化ラインを導入。品質の安定化とリードタイム短縮を実現しました。",
+    photoLabel: "1980 Automation",
+    image: "linear-gradient(135deg, #e873ff, #6b2b84)"
+  },
+  {
+    year: 1995,
+    title: "海外拠点を開設",
+    description: "海外生産と物流ネットワークを構築し、グローバル展開を加速しました。",
+    photoLabel: "1995 Global Site",
+    image: "linear-gradient(135deg, #ffa57b, #854c33)"
+  },
+  {
+    year: 2010,
+    title: "環境対応型工場へ刷新",
+    description: "省エネ設備を導入し、CO2排出削減と生産効率向上を同時に進めました。",
+    photoLabel: "2010 Green Factory",
+    image: "linear-gradient(135deg, #77ebb4, #2f7758)"
+  },
+  {
+    year: 2025,
+    title: "60周年プロジェクト",
+    description: "創業60年を記念して、歴史アーカイブの整備と次世代製品開発を開始しました。",
+    photoLabel: "2025 60th Project",
+    image: "linear-gradient(135deg, #90a0ff, #af58f0)"
+  }
+];
+
 const languageInput = document.getElementById("languageInput");
 const showButton = document.getElementById("showButton");
 const resultSection = document.getElementById("result");
@@ -1269,11 +1314,17 @@ const languageDescription = document.getElementById("languageDescription");
 const tagFilter = document.getElementById("tagFilter");
 const tagTableBody = document.getElementById("tagTableBody");
 const languageCandidates = document.getElementById("languageCandidates");
+const timelineTrack = document.getElementById("timelineTrack");
+const timelineYear = document.getElementById("timelineYear");
+const timelineText = document.getElementById("timelineText");
+const timelinePlayButton = document.getElementById("timelinePlayButton");
+const timelinePauseButton = document.getElementById("timelinePauseButton");
 
 let currentLanguageKey = "";
 
 const aliasToKey = buildAliasMap(languageCatalog);
 populateCandidates(languageCatalog, languageCandidates);
+renderTimeline(historyTimeline);
 
 showButton.addEventListener("click", handleShow);
 languageInput.addEventListener("keydown", (event) => {
@@ -1288,6 +1339,8 @@ tagFilter.addEventListener("input", () => {
   }
   renderTags(currentLanguageKey, tagFilter.value);
 });
+timelinePlayButton?.addEventListener("click", playTimeline);
+timelinePauseButton?.addEventListener("click", pauseTimeline);
 
 function buildAliasMap(catalog) {
   const map = {};
@@ -1431,4 +1484,111 @@ function hideResult() {
 
 function normalize(value) {
   return String(value || "").trim().toLowerCase();
+}
+
+function renderTimeline(items) {
+  if (!timelineTrack || !timelineYear || !timelineText || !items.length) {
+    return;
+  }
+
+  const strip = document.createElement("div");
+  strip.className = "timeline-strip";
+
+  const doubled = [...items, ...items];
+  doubled.forEach((item, index) => {
+    strip.appendChild(createTimelineCard(item, index));
+  });
+
+  timelineTrack.innerHTML = "";
+  timelineTrack.appendChild(strip);
+  selectTimelineYear(items[0].year);
+}
+
+function createTimelineCard(item, index) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "timeline-card";
+  button.dataset.year = String(item.year);
+  button.dataset.original = index < historyTimeline.length ? "1" : "0";
+  button.setAttribute("aria-label", `${item.year}年 ${item.title}`);
+
+  const image = document.createElement("img");
+  image.src = buildPhotoDataUri(item.photoLabel, item.image);
+  image.alt = `${item.year}年 ${item.title} の写真`;
+  button.appendChild(image);
+
+  const chip = document.createElement("span");
+  chip.className = "timeline-year-chip";
+  chip.textContent = `${item.year}年`;
+  button.appendChild(chip);
+
+  button.addEventListener("click", () => {
+    selectTimelineYear(item.year);
+  });
+
+  return button;
+}
+
+function selectTimelineYear(year) {
+  const item = historyTimeline.find((entry) => entry.year === year);
+  if (!item) {
+    return;
+  }
+
+  pauseTimeline();
+  timelineYear.textContent = `${item.year}年：${item.title}`;
+  timelineText.textContent = item.description;
+
+  timelineTrack.querySelectorAll(".timeline-card").forEach((card) => {
+    const isActive = Number(card.dataset.year) === year;
+    card.classList.toggle("active", isActive);
+  });
+}
+
+function playTimeline() {
+  timelineTrack?.classList.remove("is-paused");
+}
+
+function pauseTimeline() {
+  timelineTrack?.classList.add("is-paused");
+}
+
+function buildPhotoDataUri(label, gradient) {
+  const safeLabel = escapeSvg(label);
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${extractFirstColor(gradient)}" />
+          <stop offset="100%" stop-color="${extractSecondColor(gradient)}" />
+        </linearGradient>
+      </defs>
+      <rect width="640" height="360" fill="url(#bg)"/>
+      <g fill="rgba(255,255,255,0.22)">
+        <circle cx="110" cy="90" r="45"/>
+        <rect x="220" y="54" width="280" height="80" rx="12"/>
+        <rect x="90" y="180" width="460" height="120" rx="16"/>
+      </g>
+      <text x="50%" y="86%" dominant-baseline="middle" text-anchor="middle"
+            font-size="34" font-family="Arial, sans-serif" fill="white">${safeLabel}</text>
+    </svg>
+  `;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function extractFirstColor(gradient) {
+  const matches = gradient.match(/#(?:[0-9a-fA-F]{3}){1,2}/g) || ["#486fd8", "#263f89"];
+  return matches[0];
+}
+
+function extractSecondColor(gradient) {
+  const matches = gradient.match(/#(?:[0-9a-fA-F]{3}){1,2}/g) || ["#486fd8", "#263f89"];
+  return matches[1] || matches[0];
+}
+
+function escapeSvg(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 }
